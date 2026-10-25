@@ -80,7 +80,7 @@
     }
     .logo-text { font-size: 1.3rem; font-weight: 700; color: #ffffff; }
     .nav-links { display: flex; align-items: center; gap: 1.5rem; }
-    .nav-links a { color: var(--white-80); text-decoration: none; font-size: 0.9rem; }
+    .nav-links a { color: var(--white-80); text-decoration: none; font-size: 0.9rem; cursor: pointer; }
     .nav-cta {
       background: var(--accent); color: var(--white) !important;
       padding: 0.5rem 1.2rem; border-radius: 8px; font-weight: 600 !important; font-size: 0.85rem !important;
@@ -183,14 +183,14 @@
       <span class="logo-text">ExaShield</span>
     </a>
     <div class="nav-links">
-      <a href="#" onclick="openAcordModal()">📋 B2B ACORD Form</a>
-      <a href="#" onclick="togglePiperChat()" class="nav-cta">🤖 Chat with Piper</a>
+      <a onclick="openAcordModal()">📋 B2B ACORD Form</a>
+      <a onclick="togglePiperChat()" class="nav-cta">🤖 Chat with Piper</a>
     </div>
   </div>
 </nav>
 
 <!-- Floating CTA for B2B -->
-<a href="#" onclick="openAcordModal()" class="float-cta">
+<a onclick="openAcordModal()" class="float-cta">
   📋 Submit ACORD B2B Form
 </a>
 
@@ -239,11 +239,11 @@
     </div>
     <div class="piper-chat-body" id="piperChatBody">
       <div class="chat-msg piper">
-        Hi! I'm <strong>Piper</strong>, your AI Lead Ingestion agent. Tell me what coverage you're looking for, or try typing standard B2C or B2B requests!
+        Hi! I'm <strong>Piper</strong>, your AI lead ingestion agent. What kind of insurance coverage are you looking for today?
       </div>
     </div>
     <div class="piper-chat-footer">
-      <input type="text" id="piperInput" class="piper-chat-input" placeholder="e.g. Commercial liability for Acme Corp..." onkeydown="if(event.key==='Enter') sendPiperMsg()" />
+      <input type="text" id="piperInput" class="piper-chat-input" placeholder="Type your request here..." onkeydown="if(event.key==='Enter') sendPiperMsg()" />
       <button class="piper-chat-send" onclick="sendPiperMsg()">Send</button>
     </div>
   </div>
@@ -304,7 +304,10 @@
   function openAcordModal() { document.getElementById('acordModal').style.display = 'flex'; }
   function closeAcordModal() { document.getElementById('acordModal').style.display = 'none'; }
 
-  /* ── PIPER AGENT DYNAMIC ROUTING DEMO LOGIC ── */
+  // ── CONVERSATIONAL MULTI-STEP STATE MACHINE ──
+  let chatStep = 0;
+  let leadData = { name: '', intent: '', details: '', type: '' };
+
   function sendPiperMsg() {
     const input = document.getElementById('piperInput');
     const msg = input.value.trim();
@@ -315,28 +318,68 @@
     input.value = '';
 
     setTimeout(() => {
-      const isB2B = msg.toLowerCase().includes('b2b') || msg.toLowerCase().includes('commercial') || msg.toLowerCase().includes('corp') || msg.toLowerCase().includes('company');
-      
       let reply = '';
-      if (isB2B) {
-        reply = `I've ingested your commercial request for <strong>Salesforce FSC</strong>. Since this is a high-complexity B2B lead, I'm assigning this to the specialized queue:
-          <div class="chat-card">
-            <strong>Line of Business:</strong> Commercial/B2B<br/>
-            <strong>Handling Mode:</strong> Queued (Human)<br/>
-            <span class="chat-tag tag-queue">Routed to: Commercial B2B Queue</span>
-          </div>`;
-      } else {
-        reply = `I've registered your inquiry in <strong>Salesforce FSC</strong>. As a standard B2C request, I am handling this lead autonomously:
-          <div class="chat-card">
-            <strong>Line of Business:</strong> Individual/B2C<br/>
-            <strong>Handling Mode:</strong> Autonomous (Piper)<br/>
-            <span class="chat-tag tag-auto">Handled Autonomously by Piper</span>
-          </div>`;
+
+      if (chatStep === 0) {
+        // Step 1: Captured intent, now ask for name
+        leadData.intent = msg;
+        chatStep = 1;
+        reply = `Thanks! I can help you with that. Could you please share your **Full Name**?`;
+      } 
+      else if (chatStep === 1) {
+        // Step 2: Captured name, determine B2C vs B2B based on intent keywords
+        leadData.name = msg;
+        chatStep = 2;
+        
+        const isB2B = leadData.intent.toLowerCase().includes('b2b') || 
+                      leadData.intent.toLowerCase().includes('commercial') || 
+                      leadData.intent.toLowerCase().includes('corp') || 
+                      leadData.intent.toLowerCase().includes('liability') ||
+                      leadData.intent.toLowerCase().includes('business');
+
+        leadData.type = isB2B ? 'Commercial/B2B' : 'Individual/B2C';
+
+        if (isB2B) {
+          reply = `Got it, **${leadData.name}**. Since this is commercial, what is your company name or state?`;
+        } else {
+          reply = `Awesome, **${leadData.name}**. What state are you located in?`;
+        }
+      }
+      else if (chatStep === 2) {
+        // Step 3: Captured location/company, complete and display FSC routing card
+        leadData.details = msg;
+        chatStep = 3; 
+
+        const isB2B = leadData.type === 'Commercial/B2B';
+
+        if (isB2B) {
+          reply = `Perfect! I've successfully ingested your lead into **Salesforce Financial Services Cloud**.<br/><br/>
+            <div class="chat-card">
+              <strong>Prospect:</strong> ${leadData.name}<br/>
+              <strong>Line of Business:</strong> Commercial/B2B<br/>
+              <strong>Handling Mode:</strong> Queued (Human)<br/>
+              <span class="chat-tag tag-queue">Routed to: Commercial B2B Queue</span>
+            </div>
+            <br/>Our specialist will review your details shortly!`;
+        } else {
+          reply = `All set! I've created your lead profile in **Salesforce Financial Services Cloud**.<br/><br/>
+            <div class="chat-card">
+              <strong>Prospect:</strong> ${leadData.name}<br/>
+              <strong>Line of Business:</strong> Individual/B2C<br/>
+              <strong>Handling Mode:</strong> Autonomous (Piper)<br/>
+              <span class="chat-tag tag-auto">Handled Autonomously by Piper</span>
+            </div>
+            <br/>Your instant quote is being prepared now!`;
+        }
+      } 
+      else {
+        reply = `I'm here to help! If you'd like to start a new inquiry, just type your insurance request.`;
+        chatStep = 0;
       }
 
       body.innerHTML += `<div class="chat-msg piper">${reply}</div>`;
       body.scrollTop = body.scrollHeight;
-    }, 800);
+    }, 700);
   }
 
   function handleAcordSubmit(e) {
