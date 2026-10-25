@@ -324,7 +324,7 @@
         // Step 1: Captured intent, now ask for name
         leadData.intent = msg;
         chatStep = 1;
-        reply = `Thanks! I can help you with that. Could you please share your **Full Name**?`;
+        reply = `Thanks! I can help you with that. Could you please share your Full Name?`;
       } 
       else if (chatStep === 1) {
         // Step 2: Captured name, determine B2C vs B2B based on intent keywords
@@ -340,9 +340,9 @@
         leadData.type = isB2B ? 'Commercial/B2B' : 'Individual/B2C';
 
         if (isB2B) {
-          reply = `Got it, **${leadData.name}**. Since this is commercial, what is your company name or state?`;
+          reply = `Got it, ${leadData.name}. Since this is commercial, what is your company name or state?`;
         } else {
-          reply = `Awesome, **${leadData.name}**. What state are you located in?`;
+          reply = `Awesome, ${leadData.name}. What state are you located in?`;
         }
       }
       else if (chatStep === 2) {
@@ -362,7 +362,7 @@
             </div>
             <br/>Our specialist will review your details shortly!`;
         } else {
-          reply = `All set! I've created your lead profile in **Salesforce Financial Services Cloud**.<br/><br/>
+          reply = `All set! I've created your profile.<br/><br/>
             <div class="chat-card">
               <strong>Prospect:</strong> ${leadData.name}<br/>
               <strong>Line of Business:</strong> Individual/B2C<br/>
