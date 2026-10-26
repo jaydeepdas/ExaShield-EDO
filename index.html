@@ -180,14 +180,15 @@
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(30,136,229,0.6); }
     .btn-primary:hover::before { opacity: 1; }
 
+    /* Fixed visibility for secondary button text */
     .btn-secondary {
       display: inline-flex; align-items: center; gap: 8px;
-      color: var(--white-80); font-size: 0.95rem; font-weight: 500;
+      background: rgba(255, 255, 255, 0.1); color: var(--white); font-size: 0.95rem; font-weight: 600;
       text-decoration: none; padding: 0.85rem 1.5rem;
-      border: 1px solid rgba(255,255,255,0.15); border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md);
       transition: background 0.2s, color 0.2s; cursor: pointer;
     }
-    .btn-secondary:hover { background: var(--white-15); color: var(--white); }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.2); color: var(--white); }
 
     .arrow-icon { font-size: 1rem; transition: transform 0.2s; }
     .btn-primary:hover .arrow-icon { transform: translateX(4px); }
@@ -496,7 +497,7 @@
     .piper-chat-input { flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 0.6rem 0.8rem; color: #fff; font-size: 0.82rem; }
     .piper-chat-send { background: var(--accent); color: #fff; border: none; padding: 0.6rem 1rem; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.8rem; }
 
-    /* ── B2B ACORD MODAL STYLES ── */
+    /* ── B2B COMMERCIAL MODAL STYLES ── */
     .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
     .acord-modal { background: var(--navy-mid); border: 1px solid rgba(255,255,255,0.2); width: 100%; max-width: 620px; border-radius: var(--radius-xl); padding: 2.2rem; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.7); }
     .modal-close { position: absolute; top: 1.2rem; right: 1.5rem; background: none; border: none; color: #fff; font-size: 1.4rem; cursor: pointer; }
@@ -550,7 +551,7 @@
       <a href="#products">Products</a>
       <a href="#how">How It Works</a>
       <a href="#why">Why ExaShield</a>
-      <a onclick="openAcordModal()">📋 B2B ACORD Form</a>
+      <a onclick="openAcordModal()">📋 Commercial Application</a>
       <a href="https://jaydeepdas.github.io/LMS-form/" target="_blank" class="nav-cta">Get a Quote →</a>
     </div>
   </div>
@@ -587,12 +588,12 @@
   <button class="piper-toggle-btn" onclick="togglePiperChat()" title="Talk to Piper Agent">🤖</button>
 </div>
 
-<!-- ── B2B ACORD FORM MODAL ── -->
+<!-- ── COMMERCIAL APPLICATION FORM MODAL ── -->
 <div class="modal-backdrop" id="acordModal">
   <div class="acord-modal">
     <button class="modal-close" onclick="closeAcordModal()">✕</button>
-    <h3 style="font-size:1.4rem;font-weight:700;">ACORD Commercial Lead Intake (B2B)</h3>
-    <p style="font-size:0.82rem;color:var(--text-muted);margin-top:4px;">Submit structured commercial insurance requests directly to our Salesforce Financial Services Cloud Queue.</p>
+    <h3 style="font-size:1.4rem;font-weight:700;">Commercial Business Intake (B2B)</h3>
+    <p style="font-size:0.82rem;color:var(--text-muted);margin-top:4px;">Submit structured commercial insurance requests directly to our specialized team queue.</p>
     
     <form id="acordForm" onsubmit="handleAcordSubmit(event)">
       <div class="acord-form-grid">
@@ -626,7 +627,7 @@
         </div>
       </div>
       <button type="submit" class="btn-primary" style="width:100%;margin-top:1.5rem;justify-content:center;">
-        Submit ACORD B2B Lead
+        Submit Commercial Request
       </button>
     </form>
   </div>
@@ -654,6 +655,7 @@
           <a href="https://jaydeepdas.github.io/LMS-EDO-Form/" target="_blank" class="btn-primary">
             Get My Free Quote <span class="arrow-icon">→</span>
           </a>
+          <!-- Fixed Button Text Visibility Class (.btn-secondary) -->
           <button class="btn-secondary" onclick="togglePiperChat()">
             🤖 Chat with Piper AI
           </button>
@@ -1064,7 +1066,7 @@
     });
   }, 3500);
 
-  /* ── PIPER & ACORD MODAL SCRIPT ── */
+  /* ── PIPER & COMMERCIAL MODAL SCRIPT ── */
   function togglePiperChat() {
     const w = document.getElementById('piperChatWindow');
     w.style.display = w.style.display === 'flex' ? 'none' : 'flex';
@@ -1091,7 +1093,7 @@
       if (chatStep === 0) {
         leadData.intent = msg;
         chatStep = 1;
-        reply = `Thanks! I can help you with that. Could you please share your Full Name?`;
+        reply = `Thanks! I can help you with that. Could you please share your **Full Name**?`;
       } 
       else if (chatStep === 1) {
         leadData.name = msg;
@@ -1150,7 +1152,7 @@
   function handleAcordSubmit(e) {
     e.preventDefault();
     const company = document.getElementById('acordCompany').value;
-    alert(`ACORD Commercial Lead for "${company}" successfully ingested into Salesforce Financial Services Cloud B2B Queue!`);
+    alert(`Commercial Business Lead for "${company}" successfully ingested into Salesforce Financial Services Cloud B2B Queue!`);
     closeAcordModal();
   }
 </script>
